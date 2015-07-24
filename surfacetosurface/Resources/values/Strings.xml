@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">Start MediaCodec tests - Check in your external storage for h264 tracks</string>
+	<string name="app_name">surfacetosurface</string>
+</resources>
