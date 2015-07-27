@@ -27,11 +27,11 @@ using Android.Content;
 
 namespace MediaCodecHelper {
 
-	public class MediaCodecWrapper {
+	public class GeneratedVideoToMp4 {
 
 		private string _workingDirectory;
 
-		public MediaCodecWrapper(Context context) {
+		public GeneratedVideoToMp4(Context context) {
 			_context = context;
 			_workingDirectory = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
 		}
@@ -47,7 +47,7 @@ namespace MediaCodecHelper {
 		private const int FRAME_RATE = 15; // 15fps
 		private const int IFRAME_INTERVAL = 10; // 10 seconds between I-frames
 		// movie length, in frames
-		private const int NUM_FRAMES = 30; // two seconds of video
+		private const int NUM_FRAMES = 120; // two seconds of video
 		private const int TEST_R0 = 0; // dull green background
 		private const int TEST_G0 = 136;
 		private const int TEST_B0 = 0;
@@ -71,7 +71,7 @@ namespace MediaCodecHelper {
 		// largest color component delta seen (i.e. actual vs. expected)
 		private int mLargestColorDelta;
 
-		public void StartTest() {
+		public void Start() {
 			setParameters(1280, 720, 6000000);
 			videoEditTest();
 		}
@@ -171,6 +171,9 @@ namespace MediaCodecHelper {
 			}
 			return true;
 		}
+
+
+
 		/**
 	* Returns the first codec capable of encoding the specified MIME type, or null if no
 	* match was found.
@@ -191,13 +194,16 @@ namespace MediaCodecHelper {
 			}
 			return null;
 		}
+
+		const int TIMEOUT_USEC = 10000;
+
 		/**
 	* Generates video frames, feeds them into the encoder, and writes the output to the
 	* VideoChunks instance.
 	*/
 		private void generateVideoData(MediaCodec encoder, InputSurface inputSurface,
 			VideoChunks output) {
-			const int TIMEOUT_USEC = 10000;
+
 			ByteBuffer[] encoderOutputBuffers = encoder.GetOutputBuffers();
 			MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
 			int generateIndex = 0;
@@ -223,7 +229,7 @@ namespace MediaCodecHelper {
 						inputDone = true;
 					} else {
 						generateSurfaceFrame(generateIndex);
-						inputSurface.setPresentationTime(computePresentationTime(generateIndex) * 1000);
+						inputSurface.SetPresentationTime(computePresentationTime(generateIndex) * 1000);
 						if (VERBOSE) Log.Debug(TAG, "inputSurface swapBuffers");
 						inputSurface.SwapBuffers();
 					}
@@ -276,7 +282,7 @@ namespace MediaCodecHelper {
 				}
 			}
 
-			// One chunk per frame, plus one for the config data.
+
 			assertEquals("Frame count", NUM_FRAMES + 1, outputCount);
 		}
 
@@ -498,7 +504,7 @@ namespace MediaCodecHelper {
 									outputSurface.AwaitNewImage();
 									outputSurface.DrawImage();
 									// Send it to the encoder.
-									inputSurface.setPresentationTime(info.PresentationTimeUs * 1000);
+									inputSurface.SetPresentationTime(info.PresentationTimeUs * 1000);
 									if (VERBOSE) Log.Debug(TAG, "swapBuffers");
 									inputSurface.SwapBuffers();
 								}

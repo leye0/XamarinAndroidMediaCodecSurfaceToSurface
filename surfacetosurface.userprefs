@@ -1,20 +1,18 @@
 ﻿<Properties StartupItem="surfacetosurface\surfacetosurface.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.YT910HX7SE" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="surfacetosurface\MainActivity.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.SelectDevice" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="surfacetosurface\FileToMp4.cs">
     <Files>
-      <File FileName="surfacetosurface\MainActivity.cs" Line="11" Column="1" />
-      <File FileName="surfacetosurface\MediaCodecHelper.cs" Line="127" Column="33" />
-      <File FileName="surfacetosurface\InputSurface.cs" Line="5" Column="9" />
-      <File FileName="surfacetosurface\OutputSurface.cs" Line="159" Column="32" />
-      <File FileName="surfacetosurface\TextureRenderer.cs" Line="108" Column="23" />
-      <File FileName="surfacetosurface\Properties\AndroidManifest.xml" Line="7" Column="12" />
-      <File FileName="surfacetosurface\Resources\values\Strings.xml" Line="3" Column="2" />
+      <File FileName="surfacetosurface\MainActivity.cs" Line="30" Column="26" />
+      <File FileName="surfacetosurface\InputSurface.cs" Line="1" Column="1" />
+      <File FileName="surfacetosurface\TextureRenderer.cs" Line="1" Column="1" />
+      <File FileName="surfacetosurface\OutputSurface.cs" Line="1" Column="1" />
+      <File FileName="surfacetosurface\FileToMp4.cs" Line="181" Column="26" />
+      <File FileName="surfacetosurface\CameraToMp4.cs" Line="1" Column="1" />
+      <File FileName="surfacetosurface\GeneratedVideoToMp4.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="C:\Users\leon.pelletier.APCURIUM\Documents\Projects\surfacetosurface\surfacetosurface\MediaCodecHelper.cs" line="280" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

@@ -51,32 +51,33 @@ using Java.Lang;
 using Android.Runtime;
 
 namespace MediaCodecHelper {	
+	
 	public class OutputSurface : Java.Lang.Object, SurfaceTexture.IOnFrameAvailableListener {
-	private const string TAG = "OutputSurface";
-	private const bool VERBOSE = false;
-	private const int EGL_OPENGL_ES2_BIT = 4;
-	private IEGL10 mEGL;
-	private EGLDisplay mEGLDisplay;
-	private EGLContext mEGLContext;
-	private EGLSurface mEGLSurface;
-	private SurfaceTexture _surfaceTexture;
-	private Surface _surface;
-	private object _frameSyncObject = new object(); // guards mFrameAvailable
-	private bool _frameAvailable;
-	private TextureRender _textureRender;
-	/**
-* Creates an OutputSurface backed by a pbuffer with the specifed dimensions. The new
-* EGL context and surface will be made current. Creates a Surface that can be passed
-* to MediaCodec.configure().
-*/
-	public OutputSurface(int width, int height) {
-		if (width <= 0 || height <= 0) {
-			throw new IllegalArgumentException();
+		private const string TAG = "OutputSurface";
+		private const bool VERBOSE = false;
+		private const int EGL_OPENGL_ES2_BIT = 4;
+		private IEGL10 mEGL;
+		private EGLDisplay mEGLDisplay;
+		private EGLContext mEGLContext;
+		private EGLSurface mEGLSurface;
+		private SurfaceTexture _surfaceTexture;
+		private Surface _surface;
+		private object _frameSyncObject = new object(); // guards mFrameAvailable
+		public bool IsFrameAvailable;
+		private TextureRender _textureRender;
+		/**
+		* Creates an OutputSurface backed by a pbuffer with the specifed dimensions. The new
+		* EGL context and surface will be made current. Creates a Surface that can be passed
+		* to MediaCodec.configure().
+		*/
+		public OutputSurface(int width, int height) {
+			if (width <= 0 || height <= 0) {
+				throw new IllegalArgumentException ();
+			}
+			eglSetup (width, height);
+			makeCurrent ();
+			setup ();
 		}
-		eglSetup(width, height);
-		makeCurrent();
-		setup();
-	}
 	/**
 * Creates an OutputSurface using the current EGL context. Creates a Surface that can be
 * passed to MediaCodec.configure().
@@ -118,10 +119,10 @@ namespace MediaCodecHelper {
 	private void FrameAvailable (object sender, SurfaceTexture.FrameAvailableEventArgs e)
 	{
 		System.Threading.Monitor.Enter (_frameSyncObject);
-		if (_frameAvailable) {
+		if (IsFrameAvailable) {
 			throw new RuntimeException("mFrameAvailable already set, frame could be dropped");
 		}
-		_frameAvailable = true;
+		IsFrameAvailable = true;
 		System.Threading.Monitor.PulseAll (_frameSyncObject);
 		System.Threading.Monitor.Exit (_frameSyncObject);
 	}
@@ -222,76 +223,61 @@ namespace MediaCodecHelper {
 				return _surface;
 			}
 	}
+
+		/**
+* Returns the Surface Texture
+*/
+		public SurfaceTexture SurfaceTexture {
+			get { 
+				return _surfaceTexture;
+			}
+		}
+
 	/**
 * Replaces the fragment shader.
 */
 	public void ChangeFragmentShader(string fragmentShader) {
 		_textureRender.ChangeFragmentShader(fragmentShader);
 	}
-	/**
-* Latches the next buffer into the texture. Must be called from the thread that created
-* the OutputSurface object, after the onFrameAvailable callback has signaled that new
-* data is available.
-*/
-//	public void AwaitNewImageOLD() {
-//		const int TIMEOUT_MS = 500;
-//			var now = System.DateTime.Now;
-//			lock (_frameSyncObject) {
-//			while (!_frameAvailable) {
-//				try {
-//					// Wait for onFrameAvailable() to signal us. Use a timeout to avoid
-//					// stalling the test if it doesn't arrive.
-//						System.Threading.Thread.Sleep(TIMEOUT_MS);
-//					//_frameSyncObject.Wait(TIMEOUT_MS);
-//						if (!_frameAvailable && (System.DateTime.Now - now > System.TimeSpan.FromSeconds(3))) {
-//						// TODO: if "spurious wakeup", continue while loop
-//						throw new RuntimeException("Surface frame wait timed out");
-//					}
-//				} catch (InterruptedException ie) {
-//					// shouldn't happen
-//					throw new RuntimeException(ie);
-//				}
-//			}
-//
-//				_frameAvailable = false;
-//		}
-//		// Latch the data.
-//		_textureRender.CheckGlError("before updateTexImage");
-//			_surfaceTexture.UpdateTexImage();
-//	}
-//
 
-		public void AwaitNewImage() {
+		public bool AwaitNewImage(bool returnOnFailure = false) {
 			
-			const int TIMEOUT_MS = 50500;
+			const int TIMEOUT_MS = 1000;
 
 			System.Threading.Monitor.Enter (_frameSyncObject);
 
 
-			while (!_frameAvailable) {
+			while (!IsFrameAvailable) {
 				try {
 					// Wait for onFrameAvailable() to signal us.  Use a timeout to avoid
 					// stalling the test if it doesn't arrive.
 					System.Threading.Monitor.Wait (_frameSyncObject, TIMEOUT_MS);
 
-					if (!_frameAvailable) {
+					if (!IsFrameAvailable) {
+						if (returnOnFailure) {
+							return false;
+						}
 						// TODO: if "spurious wakeup", continue while loop
 						throw new RuntimeException ("frame wait timed out");
 					}
 				} catch (InterruptedException ie) {
+					if (returnOnFailure) {
+						return false;
+					}
 					// shouldn't happen
 					throw new RuntimeException (ie);
 				}
 			}
 
 
-			_frameAvailable = false;
+			IsFrameAvailable = false;
 
 			System.Threading.Monitor.Exit (_frameSyncObject);
 
 			var curDisplay = EGLContext.EGL.JavaCast<IEGL10>().EglGetCurrentDisplay();
 			_textureRender.CheckGlError ("before updateTexImage");
 			_surfaceTexture.UpdateTexImage ();
+			return true;
 		}
 	/**
 * Draws the data from SurfaceTexture onto the current EGL surface.
@@ -303,10 +289,10 @@ namespace MediaCodecHelper {
 	public void OnFrameAvailable(SurfaceTexture st) {
 		if (VERBOSE) Log.Debug(TAG, "new frame available");
 		lock (_frameSyncObject) {
-			if (_frameAvailable) {
+			if (IsFrameAvailable) {
 				throw new RuntimeException("mFrameAvailable already set, frame could be dropped");
 			}
-			_frameAvailable = true;
+			IsFrameAvailable = true;
 			//_frameSyncObject.NotifyAll();
 		}
 	}

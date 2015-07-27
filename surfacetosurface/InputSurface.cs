@@ -156,7 +156,7 @@ namespace MediaCodecHelper {
 		/**
 		* Sends the presentation time stamp to EGL. Time is expressed in nanoseconds.
 		*/
-		public void setPresentationTime(long nsecs) {
+		public void SetPresentationTime(long nsecs) {
 			EGLExt.EglPresentationTimeANDROID(_EGLDisplay, _EGLSurface, nsecs);
 		}
 

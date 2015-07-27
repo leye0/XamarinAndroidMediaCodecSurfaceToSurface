@@ -14,7 +14,7 @@ namespace surfacetosurface
 	[Activity (Label = "surfacetosurface", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : Activity
 	{
-		int count = 1;
+		
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -26,10 +26,14 @@ namespace surfacetosurface
 			// Get our button from the layout resource,
 			// and attach an event to it
 			Button button = FindViewById<Button> (Resource.Id.myButton);
-			var myCodec = new MediaCodecWrapper (this);
+
+			//var myCodec = new CameraToMp4 (this);
+			//var myCodec = new GeneratedVideoToMp4();
+			var myCodec = new FileToMp4 (this, 24, 1, null);
+
 			button.Click += delegate {
 				Task.Run(() => {
-					myCodec.StartTest();	
+					myCodec.Start();	
 				});
 			};
 		}

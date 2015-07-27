@@ -50,7 +50,9 @@
     <Compile Include="InputSurface.cs" />
     <Compile Include="OutputSurface.cs" />
     <Compile Include="TextureRenderer.cs" />
-    <Compile Include="MediaCodecHelper.cs" />
+    <Compile Include="FileToMp4.cs" />
+    <Compile Include="CameraToMp4.cs" />
+    <Compile Include="GeneratedVideoToMp4.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
